@@ -25,15 +25,15 @@ def ftcs_advection(xf, nx, tf, nt, c):
     # Index variable for spatial position is l
     for l in range(nx):
         # Case 1: f(x)
-        # if abs(x[l]) < 1:
-        #     u[0, l] = np.exp(-1 / (1 - x[l]**2))
-        # else:
-        #     u[0, l] = 0.0
-        # Case 2: g(x)
-        if 0 < x[l] < 1:
-            u[0, l] = x[l]
+        if abs(x[l]) < 1:
+            u[0, l] = np.exp(-1 / (1 - x[l]**2))
         else:
             u[0, l] = 0.0
+        # Case 2: g(x)
+        # if 0 < x[l] < 1:
+        #     u[0, l] = x[l]
+        # else:
+        #     u[0, l] = 0.0
     
     # FTCS scheme
     # Index variable for time is n
@@ -49,9 +49,9 @@ def ftcs_advection(xf, nx, tf, nt, c):
 
 # Parameters
 xf = 3.0      # Spatial domain limit
-nx = 101      # Number of spatial points
+nx = 201      # Number of spatial points
 tf = 1.0      # Final time
-nt = 200      # Number of time steps
+nt = 400      # Number of time steps
 c = 2.5       # Wave speed
 
 # Run the FTCS advection solver
@@ -66,8 +66,8 @@ min_point, = ax.plot([], [], 'go')  # Point for minimum
 max_text = ax.text(0, 0, '', fontsize=10, color='red', ha='center')
 min_text = ax.text(0, 0, '', fontsize=10, color='green', ha='center')
 ax.set_xlim(-xf, xf)
-# ax.set_ylim(-0.85, 0.85) # Case 1
-ax.set_ylim(-6.5, 6.5) # Case 2
+ax.set_ylim(-0.85, 0.85) # Case 1
+# ax.set_ylim(-7.5, 7.5) # Case 2
 ax.set_xlabel('x')
 ax.set_ylabel('u(x,t)')
 ax.set_title('1D Linear Advection using FTCS Scheme')
@@ -80,9 +80,9 @@ def update(frame):
     max_point.set_data([x[max_idx]], [u[frame, max_idx]])
     min_point.set_data([x[min_idx]], [u[frame, min_idx]])
     # Update text labels
-    max_text.set_position((x[max_idx], u[frame, max_idx] + 0.50))
+    max_text.set_position((x[max_idx], u[frame, max_idx] + 0.10))
     max_text.set_text(f'Max: {u[frame, max_idx]:.2f}')
-    min_text.set_position((x[min_idx], u[frame, min_idx] - 0.50))
+    min_text.set_position((x[min_idx], u[frame, min_idx] - 0.10))
     min_text.set_text(f'Min: {u[frame, min_idx]:.2f}')
     ax.set_title(f'1D Linear Advection using FTCS Scheme\nt = {frame * (tf / nt):.2f} s')
     return line, max_point, min_point, max_text, min_text
@@ -92,24 +92,24 @@ plt.show()
 
 # Plot specific time snapshots along with the max and min values
 # Make 4 subplots on one figure
-# Choose to plot at t = 0, tf/2, 3tf/4, tf
-time_snapshots = [0, nt // 2, 3 * nt // 4, nt - 1]
+# Choose to plot at t = 0, tf/3, 2tf/3, tf
+time_snapshots = [0, nt // 3, 2 * nt // 3, nt - 1]
 fig2, axs = plt.subplots(2, 2, figsize=(10, 8))
 for i, t in enumerate(time_snapshots):
     ax = axs[i // 2, i % 2]
     ax.plot(x, u[t, :], color='b')
     ax.plot(x[np.argmax(u[t, :])], u[t, np.argmax(u[t, :])], 'ro')  # Max point
     ax.plot(x[np.argmin(u[t, :])], u[t, np.argmin(u[t, :])], 'go')  # Min point
-    ax.text(x[np.argmax(u[t, :])], u[t, np.argmax(u[t, :])] + 0.50,
+    ax.text(x[np.argmax(u[t, :])], u[t, np.argmax(u[t, :])] + 0.10,
             f'Max: {u[t, np.argmax(u[t, :])]:.2f}', fontsize=10, color='red', ha='center') # Max label
-    ax.text(x[np.argmin(u[t, :])], u[t, np.argmin(u[t, :])] - 0.50,
+    ax.text(x[np.argmin(u[t, :])], u[t, np.argmin(u[t, :])] - 0.10,
             f'Min: {u[t, np.argmin(u[t, :])]:.2f}', fontsize=10, color='green', ha='center') # Min label
     ax.set_title(f't = {t * (tf / nt):.2f} s')
     ax.set_xlabel('x')
     ax.set_ylabel('u(x,t)')
     ax.set_xlim(-xf, xf)
-    # ax.set_ylim(-0.85, 0.85) # Case 1
-    ax.set_ylim(-6.5, 6.5) # Case 2
+    ax.set_ylim(-0.85, 0.85) # Case 1
+    # ax.set_ylim(-7.5, 7.5) # Case 2
 fig2.suptitle('1D Linear Advection using FTCS Scheme, Initial Condition g(x) - Snapshots at Different Times')
 plt.tight_layout()
 plt.show()
