@@ -5,7 +5,7 @@ import matplotlib.animation as animation
 
 # Function to implement the FTCS scheme
 # Initial condition case 1: u(x,0) = f(x) = exp(-1/(1-x**2)) for |x| < 1, 0 otherwise
-# Initial condition case 2: u(x,0) = g(x) = x for |0 < x < 1, 0 otherwise
+# Initial condition case 2: u(x,0) = g(x) = x for 0 < x < 1, 0 otherwise
 # Domain: x in [-xf, xf], t in [0, tf]
 # Boundary conditions: u(-xf,t) = 0, u(xf,t) = 0
 # Define x = 0 at the center of the domain
