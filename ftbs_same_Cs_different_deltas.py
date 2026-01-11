@@ -1,11 +1,11 @@
-# Solving the 1D linear advection equation using the FTCS scheme
+# Solving the 1D linear advection equation using a basic upwinding forward time backward space (FTBS) scheme
 # For same values of Courant number C
 # No animation, just snapshots of t = 0, tf/3, 2tf/3, tf
 # Only case 1 initial condition is used here
 import numpy as np
 import matplotlib.pyplot as plt
 
-# Function to implement the FTCS scheme
+# Function to implement the FTBS scheme
 # Initial condition case 1: u(x,0) = f(x) = exp(-1/(1-x**2)) for |x| < 1, 0 otherwise
 # Domain: x in [-xf, xf], t in [0, tf]
 # Boundary conditions: u(-xf,t) = 0, u(xf,t) = 0
@@ -36,11 +36,11 @@ def ftcs_advection(xf, nx, tf, nt, c):
         else:
             u[0, l] = 0.0
     
-    # FTCS scheme
+    # FTBS scheme
     # Index variable for time is n
     for n in range(0, nt - 1):
         for l in range(1, nx - 1):
-            u[n + 1, l] = u[n, l] - (c * dt / (2 * dx)) * (u[n, l + 1] - u[n, l - 1])
+            u[n + 1, l] = u[n, l] - (c * dt / dx) * (u[n, l] - u[n, l - 1])
         
         # Boundary conditions
         u[n + 1, 0] = 0.0
@@ -76,8 +76,8 @@ for j in range(len(nx)):
         ax.set_xlabel('x')
         ax.set_ylabel('u(x,t)')
         ax.set_xlim(-xf, xf)
-        ax.set_ylim(-8.5, 8.5)
+        ax.set_ylim(-0.85, 1.25)
         ax.legend()
-    fig2.suptitle('1D Linear Advection using FTCS Scheme, Initial Condition g(x) - Same Courant Numbers')
+    fig2.suptitle('1D Linear Advection using FTBS Scheme, Initial Condition g(x) - Same Courant Numbers')
 plt.tight_layout()
 plt.show()

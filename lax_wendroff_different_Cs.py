@@ -1,16 +1,16 @@
-# Solving the 1D linear advection equation using the Lax-Friedrichs scheme
+# Solving the 1D linear advection equation using the Lax-Wendroff scheme
 # For different values of Courant number C
 # No animation, just snapshots of t = 0, tf/3, 2tf/3, tf
 # Only case 1 initial condition is used here
 import numpy as np
 import matplotlib.pyplot as plt
 
-# Function to implement the Lax-Friedrichs scheme
-# Initial condition case 1: u(x,0) = f(x) = exp(-1/(1-x**2)) for |x| < 1, 0 otherwise
+# Function to implement the Lax-Wendroff scheme
+# Initial condition case 1: u(x,L0) = f(x) = exp(-1/(1-x**2)) for |x| < 1, 0 otherwise
 # Domain: x in [-xf, xf], t in [0, tf]
 # Boundary conditions: u(-xf,t) = 0, u(xf,t) = 0
 # Define x = 0 at the center of the domain
-def ftcs_advection(xf, nx, tf, nt, c):
+def lax_wendroff_advection(xf, nx, tf, nt, c):
     # Spatial discretisation
     x = np.linspace(-xf, xf, nx)
     dx = x[1] - x[0]
@@ -36,11 +36,12 @@ def ftcs_advection(xf, nx, tf, nt, c):
         else:
             u[0, l] = 0.0
 
-    # Lax-Friedrichs scheme
+    # Lax-Wendroff scheme
     # Index variable for time is n
     for n in range(0, nt - 1):
         for l in range(1, nx - 1):
-            u[n + 1, l] = 0.5 * (u[n, l + 1] + u[n, l - 1]) - (c * dt / (2 * dx)) * (u[n, l + 1] - u[n, l - 1])
+            u[n + 1, l] = (u[n, l] - 0.5 * (c * dt / dx) * (u[n, l + 1] - u[n, l - 1]) +
+                           0.5 * (c * dt / dx)**2 * (u[n, l + 1] - 2 * u[n, l] + u[n, l - 1]))
         
         # Boundary conditions
         u[n + 1, 0] = 0.0
@@ -61,25 +62,26 @@ c = 2.5       # Wave speed
 fig2, axs = plt.subplots(2, 2, figsize=(10, 8))
 colours = ['b', 'g', 'r', 'm', 'y']
 for j in range(len(nx)):
-    x, u = ftcs_advection(xf, nx[j], tf, nt, c)
+    x, u = lax_wendroff_advection(xf, nx[j], tf, nt, c)
     time_snapshots = [0, nt // 3, 2 * nt // 3, nt - 1]
     for i, t in enumerate(time_snapshots):
         ax = axs[i // 2, i % 2]
-        ax.plot(x, u[t, :], color=colours[j], label=f'Δx={xf/nx[j]:.3f}, Δt={tf/nt:.4f}, Max={u[t, np.argmax(u[t, :])]:.2f}, Min={u[t, np.argmin(u[t, :])]:.2f}') # Put max and min points in label
+        ax.plot(x, u[t, :], color=colours[j], label=f'Δx={xf/nx[j]:.2g}, Δt={tf/nt:.2g}, Max={u[t, np.argmax(u[t, :])]:.2g}, Min={u[t, np.argmin(u[t, :])]:.2g}') # Put max and min points in label
         ax.plot(x[np.argmax(u[t, :])], u[t, np.argmax(u[t, :])], f'{colours[j]}o')  # Max point
         ax.plot(x[np.argmin(u[t, :])], u[t, np.argmin(u[t, :])], f'{colours[j]}o')  # Min point
         # ax.text(x[np.argmax(u[t, :])], u[t, np.argmax(u[t, :])] + 0.10,
         #         f'Max: {u[t, np.argmax(u[t, :])]:.2f}', fontsize=10, color=f'{colours[j]}', ha='center') # Max label
         # ax.text(x[np.argmin(u[t, :])], u[t, np.argmin(u[t, :])] - 0.10,
         #         f'Min: {u[t, np.argmin(u[t, :])]:.2f}', fontsize=10, color=f'{colours[j]}', ha='center') # Min label
-        ax.set_title(f't = {t * (tf / nt):.2f} s')
+        ax.set_title(f't = {t * (tf / nt):.2g} s')
         ax.set_xlabel('x')
         ax.set_ylabel('u(x,t)')
         ax.set_xlim(-xf, xf)
         ax.set_ylim(-0.25, 1.25)
-        ax.legend()
-    fig2.suptitle('1D Linear Advection using Lax-Friedrichs Scheme, Initial Condition g(x) - Varying Δx')
+        ax.legend(fontsize=9, loc='upper left')
+    fig2.suptitle('1D Linear Advection using Lax-Wendroff Scheme, Initial Condition g(x) - Varying Δx')
 plt.tight_layout()
+plt.subplots_adjust(left=0.076, bottom=0.073, right=0.98, top=0.912, wspace=0.184, hspace=0.238)
 plt.show()
 
 # Parameters
@@ -95,23 +97,24 @@ c = 2.5       # Wave speed
 fig2, axs = plt.subplots(2, 2, figsize=(10, 8))
 colours = ['b', 'g', 'r', 'm', 'y']
 for j in range(len(nt)):
-    x, u = ftcs_advection(xf, nx, tf, nt[j], c)
+    x, u = lax_wendroff_advection(xf, nx, tf, nt[j], c)
     time_snapshots = [0, nt[j] // 3, 2 * nt[j] // 3, nt[j] - 1]
     for i, t in enumerate(time_snapshots):
         ax = axs[i // 2, i % 2]
-        ax.plot(x, u[t, :], color=colours[j], label=f'Δx={xf/nx:.3f}, Δt={tf/nt[j]:.4f}, Max={u[t, np.argmax(u[t, :])]:.2f}, Min={u[t, np.argmin(u[t, :])]:.2f}') # Put max and min points in label
+        ax.plot(x, u[t, :], color=colours[j], label=f'Δx={xf/nx:.1g}, Δt={tf/nt[j]:.2g}, Max={u[t, np.argmax(u[t, :])]:.2g}, Min={u[t, np.argmin(u[t, :])]:.2g}') # Put max and min points in label
         ax.plot(x[np.argmax(u[t, :])], u[t, np.argmax(u[t, :])], f'{colours[j]}o')  # Max point
         ax.plot(x[np.argmin(u[t, :])], u[t, np.argmin(u[t, :])], f'{colours[j]}o')  # Min point
         # ax.text(x[np.argmax(u[t, :])], u[t, np.argmax(u[t, :])] + 0.10,
         #         f'Max: {u[t, np.argmax(u[t, :])]:.2f}', fontsize=10, color=f'{colours[j]}', ha='center') # Max label
         # ax.text(x[np.argmin(u[t, :])], u[t, np.argmin(u[t, :])] - 0.10,
         #         f'Min: {u[t, np.argmin(u[t, :])]:.2f}', fontsize=10, color=f'{colours[j]}', ha='center') # Min label
-        ax.set_title(f't = {t * (tf / nt[j]):.2f} s')
+        ax.set_title(f't = {t * (tf / nt[j]):.2g} s')
         ax.set_xlabel('x')
         ax.set_ylabel('u(x,t)')
         ax.set_xlim(-xf, xf)
         ax.set_ylim(-0.25, 1.25)
         ax.legend()
-    fig2.suptitle('1D Linear Advection using Lax-Friedrichs Scheme, Initial Condition g(x) - Varying Δt')
+    fig2.suptitle('1D Linear Advection using Lax-Wendroff Scheme, Initial Condition g(x) - Varying Δt')
 plt.tight_layout()
+plt.subplots_adjust(left=0.076, bottom=0.073, right=0.98, top=0.912, wspace=0.184, hspace=0.238)
 plt.show()

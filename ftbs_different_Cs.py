@@ -1,11 +1,11 @@
-# Solving the 1D linear advection equation using the Lax-Friedrichs scheme
+# Solving the 1D linear advection equation using the FTBS scheme
 # For different values of Courant number C
 # No animation, just snapshots of t = 0, tf/3, 2tf/3, tf
 # Only case 1 initial condition is used here
 import numpy as np
 import matplotlib.pyplot as plt
 
-# Function to implement the Lax-Friedrichs scheme
+# Function to implement the FTBS scheme
 # Initial condition case 1: u(x,0) = f(x) = exp(-1/(1-x**2)) for |x| < 1, 0 otherwise
 # Domain: x in [-xf, xf], t in [0, tf]
 # Boundary conditions: u(-xf,t) = 0, u(xf,t) = 0
@@ -26,21 +26,21 @@ def ftcs_advection(xf, nx, tf, nt, c):
     # Index variable for spatial position is l
     for l in range(nx):
         # Case 1: f(x)
-        # if abs(x[l]) < 1:
-        #     u[0, l] = np.exp(-1 / (1 - x[l]**2))
-        # else:
-        #     u[0, l] = 0.0
-        # Case 2: g(x)
-        if 0 < x[l] < 1:
-            u[0, l] = x[l]
+        if abs(x[l]) < 1:
+            u[0, l] = np.exp(-1 / (1 - x[l]**2))
         else:
             u[0, l] = 0.0
-
-    # Lax-Friedrichs scheme
+        # Case 2: g(x)
+        # if 0 < x[l] < 1:
+        #     u[0, l] = x[l]
+        # else:
+        #     u[0, l] = 0.0
+    
+    # FTBS scheme
     # Index variable for time is n
     for n in range(0, nt - 1):
         for l in range(1, nx - 1):
-            u[n + 1, l] = 0.5 * (u[n, l + 1] + u[n, l - 1]) - (c * dt / (2 * dx)) * (u[n, l + 1] - u[n, l - 1])
+            u[n + 1, l] = u[n, l] - (c * dt / dx) * (u[n, l] - u[n, l - 1])
         
         # Boundary conditions
         u[n + 1, 0] = 0.0
@@ -65,20 +65,20 @@ for j in range(len(nx)):
     time_snapshots = [0, nt // 3, 2 * nt // 3, nt - 1]
     for i, t in enumerate(time_snapshots):
         ax = axs[i // 2, i % 2]
-        ax.plot(x, u[t, :], color=colours[j], label=f'Δx={xf/nx[j]:.3f}, Δt={tf/nt:.4f}, Max={u[t, np.argmax(u[t, :])]:.2f}, Min={u[t, np.argmin(u[t, :])]:.2f}') # Put max and min points in label
+        ax.plot(x, u[t, :], color=colours[j], label=f'Δx={xf/nx[j]:.2g}, Δt={tf/nt:.2g}, Max={u[t, np.argmax(u[t, :])]:.2g}, Min={u[t, np.argmin(u[t, :])]:.2g}') # Put max and min points in label
         ax.plot(x[np.argmax(u[t, :])], u[t, np.argmax(u[t, :])], f'{colours[j]}o')  # Max point
         ax.plot(x[np.argmin(u[t, :])], u[t, np.argmin(u[t, :])], f'{colours[j]}o')  # Min point
         # ax.text(x[np.argmax(u[t, :])], u[t, np.argmax(u[t, :])] + 0.10,
         #         f'Max: {u[t, np.argmax(u[t, :])]:.2f}', fontsize=10, color=f'{colours[j]}', ha='center') # Max label
         # ax.text(x[np.argmin(u[t, :])], u[t, np.argmin(u[t, :])] - 0.10,
         #         f'Min: {u[t, np.argmin(u[t, :])]:.2f}', fontsize=10, color=f'{colours[j]}', ha='center') # Min label
-        ax.set_title(f't = {t * (tf / nt):.2f} s')
+        ax.set_title(f't = {t * (tf / nt):.2g} s')
         ax.set_xlabel('x')
         ax.set_ylabel('u(x,t)')
         ax.set_xlim(-xf, xf)
         ax.set_ylim(-0.25, 1.25)
         ax.legend()
-    fig2.suptitle('1D Linear Advection using Lax-Friedrichs Scheme, Initial Condition g(x) - Varying Δx')
+    fig2.suptitle('1D Linear Advection using FTBS Scheme, Initial Condition f(x) - Varying Δx')
 plt.tight_layout()
 plt.show()
 
@@ -99,19 +99,19 @@ for j in range(len(nt)):
     time_snapshots = [0, nt[j] // 3, 2 * nt[j] // 3, nt[j] - 1]
     for i, t in enumerate(time_snapshots):
         ax = axs[i // 2, i % 2]
-        ax.plot(x, u[t, :], color=colours[j], label=f'Δx={xf/nx:.3f}, Δt={tf/nt[j]:.4f}, Max={u[t, np.argmax(u[t, :])]:.2f}, Min={u[t, np.argmin(u[t, :])]:.2f}') # Put max and min points in label
+        ax.plot(x, u[t, :], color=colours[j], label=f'Δx={xf/nx:.1g}, Δt={tf/nt[j]:.2g}, Max={u[t, np.argmax(u[t, :])]:.2g}, Min={u[t, np.argmin(u[t, :])]:.2g}') # Put max and min points in label
         ax.plot(x[np.argmax(u[t, :])], u[t, np.argmax(u[t, :])], f'{colours[j]}o')  # Max point
         ax.plot(x[np.argmin(u[t, :])], u[t, np.argmin(u[t, :])], f'{colours[j]}o')  # Min point
         # ax.text(x[np.argmax(u[t, :])], u[t, np.argmax(u[t, :])] + 0.10,
         #         f'Max: {u[t, np.argmax(u[t, :])]:.2f}', fontsize=10, color=f'{colours[j]}', ha='center') # Max label
         # ax.text(x[np.argmin(u[t, :])], u[t, np.argmin(u[t, :])] - 0.10,
         #         f'Min: {u[t, np.argmin(u[t, :])]:.2f}', fontsize=10, color=f'{colours[j]}', ha='center') # Min label
-        ax.set_title(f't = {t * (tf / nt[j]):.2f} s')
+        ax.set_title(f't = {t * (tf / nt[j]):.2g} s')
         ax.set_xlabel('x')
         ax.set_ylabel('u(x,t)')
         ax.set_xlim(-xf, xf)
         ax.set_ylim(-0.25, 1.25)
         ax.legend()
-    fig2.suptitle('1D Linear Advection using Lax-Friedrichs Scheme, Initial Condition g(x) - Varying Δt')
+    fig2.suptitle('1D Linear Advection using FTBS Scheme, Initial Condition f(x) - Varying Δt')
 plt.tight_layout()
 plt.show()

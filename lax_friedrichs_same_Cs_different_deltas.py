@@ -5,7 +5,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-# Function to implement the FTCS scheme
+# Function to implement the Lax-Friedrichs scheme
 # Initial condition case 1: u(x,0) = f(x) = exp(-1/(1-x**2)) for |x| < 1, 0 otherwise
 # Domain: x in [-xf, xf], t in [0, tf]
 # Boundary conditions: u(-xf,t) = 0, u(xf,t) = 0
@@ -26,17 +26,17 @@ def ftcs_advection(xf, nx, tf, nt, c):
     # Index variable for spatial position is l
     for l in range(nx):
         # Case 1: f(x)
-        if abs(x[l]) < 1:
-            u[0, l] = np.exp(-1 / (1 - x[l]**2))
-        else:
-            u[0, l] = 0.0
-        # Case 2: g(x)
-        # if 0 < x[l] < 1:
-        #     u[0, l] = x[l]
+        # if abs(x[l]) < 1:
+        #     u[0, l] = np.exp(-1 / (1 - x[l]**2))
         # else:
         #     u[0, l] = 0.0
+        # Case 2: g(x)
+        if 0 < x[l] < 1:
+            u[0, l] = x[l]
+        else:
+            u[0, l] = 0.0
     
-    # FTCS scheme
+    # Lax-Friedrichs scheme
     # Index variable for time is n
     for n in range(0, nt - 1):
         for l in range(1, nx - 1):
@@ -51,9 +51,9 @@ def ftcs_advection(xf, nx, tf, nt, c):
 # Parameters
 # Courant numbers constant, vary nx and nt accordingly
 xf = 3.0      # Spatial domain limit
-nx = [2001, 501, 51]     # Number of spatial points
+nx = [2001, 201, 51]     # Number of spatial points
 tf = 1.0      # Final time
-nt = [4000, 1000, 100]     # Number of time steps
+nt = [4000, 400, 100]     # Number of time steps
 c = 2.5       # Wave speed
 
 # Plotting results for different Courant numbers
@@ -76,8 +76,8 @@ for j in range(len(nx)):
         ax.set_xlabel('x')
         ax.set_ylabel('u(x,t)')
         ax.set_xlim(-xf, xf)
-        ax.set_ylim(-0.85, 0.85)
+        ax.set_ylim(-0.85, 1.25)
         ax.legend()
-    fig2.suptitle('1D Linear Advection using Lax-Friedrichs Scheme, Initial Condition f(x) - Snapshots at Different Times')
+    fig2.suptitle('1D Linear Advection using Lax-Friedrichs Scheme, Initial Condition g(x) - Same Courant Numbers')
 plt.tight_layout()
 plt.show()
