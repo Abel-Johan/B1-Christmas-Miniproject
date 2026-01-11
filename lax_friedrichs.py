@@ -86,7 +86,7 @@ def update(frame):
     min_text.set_text(f'Min: {u[frame, min_idx]:.2f}')
     ax.set_title(f'1D Linear Advection using Lax-Friedrichs Scheme\nt = {frame * (tf / nt):.2f} s')
     return line, max_point, min_point, max_text, min_text
-ani = animation.FuncAnimation(fig, update, frames=nt, blit=False, interval=2000)
+ani = animation.FuncAnimation(fig, update, frames=nt, blit=False, interval=50)
 plt.show()
 
 
