@@ -50,6 +50,7 @@ def ftcs_advection(xf, nx, tf, nt, c):
 
 # Parameters
 # Courant numbers constant, vary nx and nt accordingly
+# C roughly equal to 0.21 for all cases
 xf = 3.0      # Spatial domain limit
 nx = [2001, 201, 51]     # Number of spatial points
 tf = 1.0      # Final time
@@ -58,14 +59,14 @@ c = 2.5       # Wave speed
 
 # Plotting results for different Courant numbers
 # Plot all tf/3, 2tf/3, tf on the same graph for each case
-fig2, axs = plt.subplots(2, 2, figsize=(10, 8))
+fig2, axs = plt.subplots(1, 3, figsize=(10, 8))
 colours = ['b', 'g', 'r']
 for j in range(len(nx)):
     x, u = ftcs_advection(xf, nx[j], tf, nt[j], c)
-    time_snapshots = [0, nt[j] // 3, 2 * nt[j] // 3, nt[j] - 1]
+    time_snapshots = [nt[j] // 3, 2 * nt[j] // 3, nt[j] - 1]
     for i, t in enumerate(time_snapshots):
-        ax = axs[i // 2, i % 2]
-        ax.plot(x, u[t, :], color=colours[j], label=f'Δx={xf/nx[j]:.3f}, Δt={tf/nt[j]:.4f}, Max={u[t, np.argmax(u[t, :])]:.2f}, Min={u[t, np.argmin(u[t, :])]:.2f}') # Put max and min points in label
+        ax = axs[i]
+        ax.plot(x, u[t, :], color=colours[j], label=f'Δx={xf*2/nx[j]:.3f}, Δt={tf/nt[j]:.4f}, Max={u[t, np.argmax(u[t, :])]:.2f}, Min={u[t, np.argmin(u[t, :])]:.2f}') # Put max and min points in label
         ax.plot(x[np.argmax(u[t, :])], u[t, np.argmax(u[t, :])], f'{colours[j]}o')  # Max point
         ax.plot(x[np.argmin(u[t, :])], u[t, np.argmin(u[t, :])], f'{colours[j]}o')  # Min point
         # ax.text(x[np.argmax(u[t, :])], u[t, np.argmax(u[t, :])] + 0.10,
@@ -76,8 +77,9 @@ for j in range(len(nx)):
         ax.set_xlabel('x')
         ax.set_ylabel('u(x,t)')
         ax.set_xlim(-xf, xf)
-        ax.set_ylim(-0.85, 1.25)
-        ax.legend()
+        ax.set_ylim(-0.05, 0.85)
+        ax.legend(fontsize=12, loc='upper left')
     fig2.suptitle('1D Linear Advection using Lax-Friedrichs Scheme, Initial Condition g(x) - Same Courant Numbers')
 plt.tight_layout()
+plt.subplots_adjust(left=0.048, bottom=0.62, right=0.985, top=0.913, wspace=0.143, hspace=0.202)
 plt.show()
