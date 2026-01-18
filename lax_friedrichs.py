@@ -25,15 +25,15 @@ def lax_friedrichs_advection(xf, nx, tf, nt, c):
     # Index variable for spatial position is l
     for l in range(nx):
         # Case 1: f(x)
-        # if abs(x[l]) < 1:
-        #     u[0, l] = np.exp(-1 / (1 - x[l]**2))
-        # else:
-        #     u[0, l] = 0.0
-        # Case 2: g(x)
-        if 0 < x[l] < 1:
-            u[0, l] = x[l]
+        if abs(x[l]) < 1:
+            u[0, l] = np.exp(-1 / (1 - x[l]**2))
         else:
             u[0, l] = 0.0
+        # Case 2: g(x)
+        # if 0 < x[l] < 1:
+        #     u[0, l] = x[l]
+        # else:
+        #     u[0, l] = 0.0
     
     # Lax-Friedrichs scheme
     # Index variable for time is n
@@ -66,8 +66,8 @@ min_point, = ax.plot([], [], 'go')  # Point for minimum
 max_text = ax.text(0, 0, '', fontsize=10, color='red', ha='center')
 min_text = ax.text(0, 0, '', fontsize=10, color='green', ha='center')
 ax.set_xlim(-xf, xf)
-# ax.set_ylim(-0.85, 0.85) # Case 1
-ax.set_ylim(-0.2, 1.2) # Case 2
+ax.set_ylim(-0.05, 0.85) # Case 1
+# ax.set_ylim(-0.2, 1.2) # Case 2
 ax.set_xlabel('x')
 ax.set_ylabel('u(x,t)')
 ax.set_title('1D Linear Advection using Lax-Friedrichs Scheme')
@@ -101,15 +101,15 @@ for i, t in enumerate(time_snapshots):
     ax.plot(x[np.argmax(u[t, :])], u[t, np.argmax(u[t, :])], 'ro')  # Max point
     ax.plot(x[np.argmin(u[t, :])], u[t, np.argmin(u[t, :])], 'go')  # Min point
     ax.text(x[np.argmax(u[t, :])], u[t, np.argmax(u[t, :])] + 0.10,
-            f'Max: {u[t, np.argmax(u[t, :])]:.2f}', fontsize=10, color='red', ha='center') # Max label
+            f'Max: {u[t, np.argmax(u[t, :])]:.2f}', fontsize=14, color='red', ha='center') # Max label
     ax.text(x[np.argmin(u[t, :])], u[t, np.argmin(u[t, :])] - 0.10,
-            f'Min: {u[t, np.argmin(u[t, :])]:.2f}', fontsize=10, color='green', ha='center') # Min label
+            f'Min: {u[t, np.argmin(u[t, :])]:.2f}', fontsize=14, color='green', ha='center') # Min label
     ax.set_title(f't = {t * (tf / nt):.2f} s')
     ax.set_xlabel('x')
     ax.set_ylabel('u(x,t)')
     ax.set_xlim(-xf, xf)
-    # ax.set_ylim(-0.85, 0.85) # Case 1
-    ax.set_ylim(-0.2, 1.2) # Case 2
-fig2.suptitle('1D Linear Advection using Lax-Friedrichs Scheme, Initial Condition g(x) - Snapshots at Different Times')
+    ax.set_ylim(-0.05, 0.85) # Case 1
+    # ax.set_ylim(-0.2, 1.2) # Case 2
+fig2.suptitle('1D Linear Advection using Lax-Friedrichs Scheme, Initial Condition f(x) - Snapshots at Different Times')
 plt.tight_layout()
 plt.show()

@@ -26,15 +26,15 @@ def ftcs_advection(xf, nx, tf, nt, c):
     # Index variable for spatial position is l
     for l in range(nx):
         # Case 1: f(x)
-        if abs(x[l]) < 1:
-            u[0, l] = np.exp(-1 / (1 - x[l]**2))
-        else:
-            u[0, l] = 0.0
-        # Case 2: g(x)
-        # if 0 < x[l] < 1:
-        #     u[0, l] = x[l]
+        # if abs(x[l]) < 1:
+        #     u[0, l] = np.exp(-1 / (1 - x[l]**2))
         # else:
         #     u[0, l] = 0.0
+        # Case 2: g(x)
+        if 0 < x[l] < 1:
+            u[0, l] = x[l]
+        else:
+            u[0, l] = 0.0
     
     # FTBS scheme
     # Index variable for time is n

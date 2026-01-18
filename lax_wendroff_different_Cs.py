@@ -26,15 +26,15 @@ def lax_wendroff_advection(xf, nx, tf, nt, c):
     # Index variable for spatial position is l
     for l in range(nx):
         # Case 1: f(x)
-        if abs(x[l]) < 1:
-            u[0, l] = np.exp(-1 / (1 - x[l]**2))
-        else:
-            u[0, l] = 0.0
-        # Case 2: g(x)
-        # if 0 < x[l] < 1:
-        #     u[0, l] = x[l]
+        # if abs(x[l]) < 1:
+        #     u[0, l] = np.exp(-1 / (1 - x[l]**2))
         # else:
         #     u[0, l] = 0.0
+        # Case 2: g(x)
+        if 0 < x[l] < 1:
+            u[0, l] = x[l]
+        else:
+            u[0, l] = 0.0
 
     # Lax-Wendroff scheme
     # Index variable for time is n
@@ -66,7 +66,7 @@ for j in range(len(nx)):
     time_snapshots = [nt // 3, 2 * nt // 3, nt - 1]
     for i, t in enumerate(time_snapshots):
         ax = axs[i]
-        ax.plot(x, u[t, :], color=colours[j], label=f'Δx={xf*2/nx[j]:.2g}, Δt={tf/nt:.2g}, Max={u[t, np.argmax(u[t, :])]:.2g}, Min={u[t, np.argmin(u[t, :])]:.2g}') # Put max and min points in label
+        ax.plot(x, u[t, :], color=colours[j], label=f'Δx={xf*2/nx[j]:.3g}, Δt={tf/nt:.2g}, Max={u[t, np.argmax(u[t, :])]:.2g}, Min={u[t, np.argmin(u[t, :])]:.2g}') # Put max and min points in label
         ax.plot(x[np.argmax(u[t, :])], u[t, np.argmax(u[t, :])], f'{colours[j]}o')  # Max point
         ax.plot(x[np.argmin(u[t, :])], u[t, np.argmin(u[t, :])], f'{colours[j]}o')  # Min point
         # ax.text(x[np.argmax(u[t, :])], u[t, np.argmax(u[t, :])] + 0.10,
@@ -77,9 +77,9 @@ for j in range(len(nx)):
         ax.set_xlabel('x')
         ax.set_ylabel('u(x,t)')
         ax.set_xlim(-xf, xf)
-        ax.set_ylim(-0.25, 1.25)
+        ax.set_ylim(-0.05, 1.25)
         ax.legend(fontsize=11, loc='upper left')
-    fig2.suptitle('1D Linear Advection using Lax-Wendroff Scheme, Initial Condition f(x) - Varying Δx')
+    fig2.suptitle('1D Linear Advection using Lax-Wendroff Scheme, Initial Condition g(x) - Varying Δx')
 plt.tight_layout()
 plt.subplots_adjust(left=0.048, bottom=0.62, right=0.985, top=0.913, wspace=0.143, hspace=0.202)
 plt.show()
@@ -112,9 +112,9 @@ for j in range(len(nt)):
         ax.set_xlabel('x')
         ax.set_ylabel('u(x,t)')
         ax.set_xlim(-xf, xf)
-        ax.set_ylim(-0.25, 1.25)
+        ax.set_ylim(-0.05, 1.25)
         ax.legend(fontsize=11, loc='upper left')
-    fig2.suptitle('1D Linear Advection using Lax-Wendroff Scheme, Initial Condition f(x) - Varying Δt')
+    fig2.suptitle('1D Linear Advection using Lax-Wendroff Scheme, Initial Condition g(x) - Varying Δt')
 plt.tight_layout()
 plt.subplots_adjust(left=0.048, bottom=0.62, right=0.985, top=0.913, wspace=0.143, hspace=0.202)
 plt.show()
